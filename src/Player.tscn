@@ -1,0 +1,107 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://assets/sprites/slime.png" type="Texture" id=1]
+[ext_resource path="res://src/Player.gd" type="Script" id=2]
+[ext_resource path="res://assets/sfx/jump.wav" type="AudioStream" id=3]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 3, 3 )
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 2.41193, 1.10219 )
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 3, 2.2195 )
+
+[sub_resource type="RectangleShape2D" id=4]
+extents = Vector2( 1.66765, 4.76189 )
+
+[sub_resource type="Animation" id=5]
+length = 0.3
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 1,
+"values": [ 3, 4, 5 ]
+}
+
+[sub_resource type="Animation" id=6]
+length = 0.4
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 0, 1, 2, 1 ]
+}
+
+[node name="Player" type="KinematicBody2D"]
+pause_mode = 1
+collision_mask = 2
+script = ExtResource( 2 )
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( -1.14899, -5.74494 )
+scale = Vector2( 1.1, 1.1 )
+texture = ExtResource( 1 )
+vframes = 2
+hframes = 3
+
+[node name="GroundedCollisionShape" type="CollisionShape2D" parent="."]
+position = Vector2( 0, -1 )
+shape = SubResource( 1 )
+
+[node name="FlyingCollisionShape" type="CollisionShape2D" parent="."]
+position = Vector2( -1.33345, 0.835298 )
+shape = SubResource( 2 )
+
+[node name="LeftRay" type="RayCast2D" parent="."]
+position = Vector2( -4, 0 )
+enabled = true
+cast_to = Vector2( 0, 10 )
+collision_mask = 2
+
+[node name="RightRay" type="RayCast2D" parent="."]
+position = Vector2( 4, 0 )
+enabled = true
+cast_to = Vector2( 0, 10 )
+collision_mask = 2
+
+[node name="Hurtbox" type="Area2D" parent="."]
+visible = false
+collision_layer = 0
+collision_mask = 4
+
+[node name="GroundHurtbox" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2( 0.0249062, -0.321589 )
+shape = SubResource( 3 )
+
+[node name="FlyingHurtbox" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2( -1.61942, -3 )
+shape = SubResource( 4 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+pause_mode = 2
+autoplay = "walk"
+anims/fly = SubResource( 5 )
+anims/walk = SubResource( 6 )
+
+[node name="SFX" type="Node2D" parent="."]
+
+[node name="Jump" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource( 3 )
+bus = "sfx"
+[connection signal="body_entered" from="Hurtbox" to="." method="_on_Hurtbox_body_entered"]
